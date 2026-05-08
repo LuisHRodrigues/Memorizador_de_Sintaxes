@@ -566,18 +566,33 @@ Atualização em tempo real
 
 # Regras Básicas do Firestore
 
-Exemplo:
-
-```js
 rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
 
+service cloud.firestore {
+match /databases/{database}/documents {
+
+    // Usuário autenticado só acessa os próprios dados
     match /usuarios/{userId} {
       allow read, write: if request.auth != null
-                           && request.auth.uid == userId;
+                          && request.auth.uid == userId;
     }
-  }
+
+    
+    match /usuarios/{userId}/memorizacoes/{docId} {
+      allow read, write: if request.auth != null
+                          && request.auth.uid == userId;
+    }
+     
+    match /usuarios/{userId}/memorizacoes/{docId}/subcards/{cardId} {
+      allow read, write: if request.auth != null
+                          && request.auth.uid == userId;
+    }
+
+    // Bloqueia todo o resto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+}
 }
 ```
 
@@ -585,36 +600,38 @@ service cloud.firestore {
 
 # Capturas de Tela
 
-## Sugestão
 
-Adicionar imagens:
-
-```text
-assets/readme/login.png
-assets/readme/cards.png
-assets/readme/snippets.png
-assets/readme/codeview.png
+### Tela de Login 
+```
+![Tela Login](assets/readme/login.png)
 ```
 
-E utilizar:
+### Tela dos cards principais
+```
+![Tela de Cards Principais](assets/readme/cards.png)
+```
 
-```md
-![Tela Login](assets/readme/login.png)
+### Tela dos SubCards
+```
+![Tela de Cards Principais](assets/readme/snippets.png)
+```
+
+### Tela de CadeView
+```
+![Tela de Cards Principais](assets/readme/codeView.png)
 ```
 
 ---
 
 # Autor
 
-Luis
+Luis Henrique Rodrigues de Oliveira
 
-Estudante de Sistemas de Informação.
+Estudante de Sistemas de Informação - Campus Urutaí.
 
 ---
 
 # Licença
 
 Projeto desenvolvido para fins de estudo e aprendizado.
-
-Você pode adaptar e evoluir livremente.
 
