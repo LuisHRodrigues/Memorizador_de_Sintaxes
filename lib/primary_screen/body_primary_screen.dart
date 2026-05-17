@@ -239,7 +239,6 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
 
         return StatefulBuilder(
           builder: (context, setState) {
-
             return Center(
               child: Dialog(
                 child: SizedBox(

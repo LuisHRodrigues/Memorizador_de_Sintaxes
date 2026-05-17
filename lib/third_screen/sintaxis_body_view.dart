@@ -36,25 +36,21 @@ class BodyThirdScreen extends StatelessWidget {
             return Column(
               children: [
                 // Espaçamento simples entre as caixas de input
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 //Widget do input da sintaxe
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsGeometry.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 20,
                     ),
 
-                    //Usar esse ou o "Container()", os dois fazem a mesma coisa pra ESSE contexto
-                    child: SizedBox(
-                      height: 600,
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(),
-                        ),
-                        child: codigoView(sintaxe),
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        enabledBorder: OutlineInputBorder(),
                       ),
+                      child: codigoView(sintaxe),
                     ),
                   ),
                 ),
@@ -68,25 +64,22 @@ class BodyThirdScreen extends StatelessWidget {
 }
 
 Widget codigoView(String codigo) {
-
   final controller = CodeController(
     text: codigo,
     language: typescript,
   );
 
-  return Expanded(
-    child: CodeTheme(
-      data: CodeThemeData(styles: githubTheme),
-      child: CodeField(
-        expands: true,
-        maxLines: null,
-        minLines: null,
-        controller: controller,
-        readOnly: true,
-        textStyle: const TextStyle(
-          fontFamily: 'monospace',
-          fontSize: 10,
-        ),
+  return CodeTheme(
+    data: CodeThemeData(styles: githubTheme),
+    child: CodeField(
+      expands: true,
+      maxLines: null,
+      minLines: null,
+      controller: controller,
+      readOnly: true,
+      textStyle: const TextStyle(
+        fontFamily: 'monospace',
+        fontSize: 12,
       ),
     ),
   );

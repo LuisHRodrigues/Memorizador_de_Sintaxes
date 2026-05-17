@@ -55,8 +55,8 @@ class _CardCreationFormState extends State<CardCreationForm> {
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(20),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 100,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),
@@ -80,12 +80,12 @@ class _CardCreationFormState extends State<CardCreationForm> {
                           ? Border.all(color: Colors.blue, width: 2)
                           : null,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
+                    child: Center(
                       child: SvgPicture.asset(
                         iconsGlobals.AppIcons.iconsDisponiveis[index],
-                        width: 30,
-                        height: 30,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

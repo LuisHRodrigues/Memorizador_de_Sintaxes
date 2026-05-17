@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 class BodySecondScreen extends StatefulWidget {
   final String cardId;
@@ -13,6 +14,7 @@ class BodySecondScreen extends StatefulWidget {
 class _BodyState extends State<BodySecondScreen> {
   final TextEditingController controllerSintaxe = TextEditingController();
   final TextEditingController controllerTitulo = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   @override
   void dispose() {
@@ -58,32 +60,99 @@ class _BodyState extends State<BodySecondScreen> {
             //Widget do input da sintaxe
             Padding(
               padding: EdgeInsetsGeometry.symmetric(
-                vertical: 10,
+                vertical: 0,
                 horizontal: 20,
               ),
 
               //Usar esse ou o "Container()", os dois fazem a mesma coisa pra ESSE contexto
-              child: SizedBox(
-                //Esse carinha define o tamanho da caixa de texto da sintaxe
-                height: 280,
-                child: TextField(
-                  maxLines: null,
-                  //Permite o usuario rolar verticalmente  dentro do campo a medida de que o mesmo cresce veriticalmente
-                  expands: true,
-                  keyboardType: TextInputType.multiline,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: InputDecoration(
-                    hintText: "Sintaxe ...",
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 1),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1),
-                    ),
-                  ),
-                  controller: controllerSintaxe,
-                ),
-              ),
+                child: LayoutBuilder(
+
+                  builder: (context, constraints) {
+
+                    final bool mobile =
+                        constraints.maxWidth < 700;
+
+                    //Logica para a tecla TAB funncionar dentro do campo de input no desktop
+                    return Focus(
+                      onKeyEvent: (node, event) {
+
+                        if (event is KeyDownEvent &&
+                        event.logicalKey ==
+                        LogicalKeyboardKey.tab) {
+
+                          final text =
+                              controllerSintaxe.text;
+
+                          final selection =
+                              controllerSintaxe.selection;
+
+                          //Aqui define quantos espaços vão ser inseridos ao clicar a tecla TAB
+                          const tabSpaces = '    ';
+
+                          final newText =
+                          text.replaceRange(
+                            selection.start,
+                            selection.end,
+                            tabSpaces,
+                          );
+
+                          controllerSintaxe.text =
+                              newText;
+
+                          controllerSintaxe.selection =
+                              TextSelection.collapsed(
+                                offset:
+                                selection.start +
+                                    tabSpaces.length,
+                              );
+
+                          return KeyEventResult.handled;
+                        }
+
+                        return KeyEventResult.ignored;
+                      },
+
+                      //Esse "child" está DENTRO do widget Focus
+                      child: SizedBox(
+
+                        height: mobile ? 280 : 600,
+
+                        child: TextField(
+
+                          controller:
+                          controllerSintaxe,
+
+                          focusNode: focusNode,
+
+                          expands: true,
+
+                          maxLines: null,
+
+                          keyboardType:
+                          TextInputType.multiline,
+
+                          textAlignVertical:
+                          TextAlignVertical.top,
+
+                          decoration: InputDecoration(
+
+                            hintText: "Sintaxe ...",
+
+                            contentPadding:
+                            EdgeInsets.only(
+                              top: 12,
+                              left: 12,
+                              right: 12,
+                            ),
+
+                            border:
+                            OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
             ),
 
             Spacer(), //Esse comando faz com que tudo que esteja dps dele vá para o rodapé

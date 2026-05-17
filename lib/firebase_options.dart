@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '287754492166',
     projectId: 'sintaxismemorizer',
     storageBucket: 'sintaxismemorizer.firebasestorage.app',
+    androidClientId: '287754492166-piep6pj32bfkqeska2a1oerfguoh6h8m.apps.googleusercontent.com',
+    iosClientId: '287754492166-23js3l57ib2759kno1nfarvtcsb0bdqg.apps.googleusercontent.com',
     iosBundleId: 'com.example.sintaxismemorizer',
   );
 
@@ -72,6 +74,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '287754492166',
     projectId: 'sintaxismemorizer',
     storageBucket: 'sintaxismemorizer.firebasestorage.app',
+    androidClientId: '287754492166-piep6pj32bfkqeska2a1oerfguoh6h8m.apps.googleusercontent.com',
+    iosClientId: '287754492166-23js3l57ib2759kno1nfarvtcsb0bdqg.apps.googleusercontent.com',
     iosBundleId: 'com.example.sintaxismemorizer',
   );
 
@@ -83,4 +87,5 @@ class DefaultFirebaseOptions {
     authDomain: 'sintaxismemorizer.firebaseapp.com',
     storageBucket: 'sintaxismemorizer.firebasestorage.app',
   );
+
 }

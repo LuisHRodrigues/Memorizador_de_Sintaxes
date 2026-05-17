@@ -233,8 +233,8 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
                       Expanded(
                         child: GridView.builder(
                           gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5,
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 80,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
@@ -263,6 +263,7 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
                                     iconsGlobals.AppIcons.iconsDisponiveis[index],
                                     width: 30,
                                     height: 30,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
