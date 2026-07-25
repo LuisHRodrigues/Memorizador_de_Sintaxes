@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../primary_screen/body_primary_screen.dart';
-import 'card_creation_form.dart';
+import '../syntax_list_screen/syntax_list_screen.dart';
+import 'category_form_screen.dart';
 import '../app_icons.dart' as iconsGlobals;
 
 class IconFormResult {
@@ -17,14 +17,14 @@ class IconFormResult {
   });
 }
 
-class CardsDeCategorias extends StatefulWidget {
-  const CardsDeCategorias({super.key});
+class CategoriesScreen extends StatefulWidget {
+  const CategoriesScreen({super.key});
 
   @override
-  State<CardsDeCategorias> createState() => _CardsDeCategorias();
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
 }
 
-class _CardsDeCategorias extends State<CardsDeCategorias> {
+class _CategoriesScreenState extends State<CategoriesScreen> {
 
   int? selectedIndex;
 
@@ -35,7 +35,7 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sintaxes Memorizer\n Cards Principais"),
+        title: const Text("CodeBit"),
         centerTitle: true,
         actions: [
           IconButton(
@@ -108,11 +108,11 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
                     itemBuilder: (context) => const [
                       PopupMenuItem(
                         value: "excluir",
-                        child: Text("Excluir"),
+                        child: Icon(Icons.delete_outline, color: Colors.red),
                       ),
                       PopupMenuItem(
                         value: "editar",
-                        child: Text("Editar"),
+                        child: Icon(Icons.edit_outlined),
                       ),
                     ],
                   ),
@@ -121,8 +121,9 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => BodyPrimaryScreen(
+                        builder: (_) => SyntaxListScreen(
                           tituloDoCard: cardId,
+                          nomeDoCard: titulo,
                         ),
                       ),
                     );
@@ -138,7 +139,7 @@ class _CardsDeCategorias extends State<CardsDeCategorias> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CardCreationForm(),
+              builder: (context) => const CategoryFormScreen(),
             ),
           );
         },

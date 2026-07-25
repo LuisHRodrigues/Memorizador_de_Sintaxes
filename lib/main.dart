@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sintaxismemorizer/auth/authGate.dart';
+import 'package:sintaxismemorizer/auth/auth_gate.dart';
 import 'package:sintaxismemorizer/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Authgate(), // 👈 direto, sem Scaffold
+      home: AuthGate(), // 👈 direto, sem Scaffold
     );
   }
 }

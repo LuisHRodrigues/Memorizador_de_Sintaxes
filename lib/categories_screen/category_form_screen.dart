@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../app_icons.dart' as iconsGlobals;
 
-class CardCreationForm extends StatefulWidget {
-  const CardCreationForm({super.key});
+class CategoryFormScreen extends StatefulWidget {
+  const CategoryFormScreen({super.key});
 
   @override
-  State<CardCreationForm> createState() => _CardCreationFormState();
+  State<CategoryFormScreen> createState() => _CategoryFormScreenState();
 }
 
 
-class _CardCreationFormState extends State<CardCreationForm> {
+class _CategoryFormScreenState extends State<CategoryFormScreen> {
   int? selectedIndex;
 
   final TextEditingController controllerTituloDoCard =
@@ -28,7 +28,7 @@ class _CardCreationFormState extends State<CardCreationForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Criar Card")),
+      appBar: AppBar(title: const Text("Novo card")),
       body: Column(
         children: [
           Padding(

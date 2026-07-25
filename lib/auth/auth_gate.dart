@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sintaxismemorizer/login_screen/login_screen.dart';
-import '../ideiasRandom/CardsDeCategorias.dart';
+import '../categories_screen/categories_screen.dart';
 
-class Authgate extends StatelessWidget {
-  const Authgate({super.key});
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class Authgate extends StatelessWidget {
 
         //Usuário logado
         if (snapshot.hasData) {
-          return const CardsDeCategorias();
+          return const CategoriesScreen();
         }
 
         //Usuário não logado

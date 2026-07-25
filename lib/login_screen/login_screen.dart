@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../ideiasRandom/CardsDeCategorias.dart';
+import '../categories_screen/categories_screen.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -89,7 +89,7 @@ class _LoginState extends State<Login> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const CardsDeCategorias(),
+          builder: (_) => const CategoriesScreen(),
         ),
       );
     });
