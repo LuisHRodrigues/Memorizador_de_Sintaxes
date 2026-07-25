@@ -3,18 +3,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 
-class BodySecondScreen extends StatefulWidget {
+class SyntaxFormScreen extends StatefulWidget {
   final String cardId;
-  const BodySecondScreen({super.key, required this.cardId});
+  final String? subcardId;
+  final String? initialTitulo;
+  final String? initialSintaxe;
+
+  const SyntaxFormScreen({
+    super.key,
+    required this.cardId,
+    this.subcardId,
+    this.initialTitulo,
+    this.initialSintaxe,
+  });
+
+  bool get isEditing => subcardId != null;
 
   @override
-  State<BodySecondScreen> createState() => _BodyState();
+  State<SyntaxFormScreen> createState() => _SyntaxFormScreenState();
 }
 
-class _BodyState extends State<BodySecondScreen> {
+class _SyntaxFormScreenState extends State<SyntaxFormScreen> {
   final TextEditingController controllerSintaxe = TextEditingController();
   final TextEditingController controllerTitulo = TextEditingController();
   final FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    controllerTitulo.text = widget.initialTitulo ?? '';
+    controllerSintaxe.text = widget.initialSintaxe ?? '';
+  }
 
   @override
   void dispose() {
@@ -26,7 +45,9 @@ class _BodyState extends State<BodySecondScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Adicionar nova sintaxe")),
+      appBar: AppBar(
+        title: Text(widget.isEditing ? "Editar sintaxe" : "Adicionar nova sintaxe"),
+      ),
       body: Card(
         child: Column(
           children: [
@@ -160,15 +181,24 @@ class _BodyState extends State<BodySecondScreen> {
             ElevatedButton(
               //Botão para salvar no BD
               onPressed: () async {
-                salvarNoBd(widget.cardId,controllerTitulo.text, controllerSintaxe.text);
-                Navigator.pop(context);
+                if (widget.isEditing) {
+                  await atualizarNoBd(
+                    widget.cardId,
+                    widget.subcardId!,
+                    controllerTitulo.text,
+                    controllerSintaxe.text,
+                  );
+                } else {
+                  await salvarNoBd(widget.cardId, controllerTitulo.text, controllerSintaxe.text);
+                }
+                if (context.mounted) Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[300],
                 foregroundColor: Colors.white,
                 minimumSize: Size(200, 40),
               ),
-              child: Text("Salvar Sintaxe"),
+              child: Text(widget.isEditing ? "Salvar Alterações" : "Salvar Sintaxe"),
             ),
           ],
         ),
@@ -196,5 +226,28 @@ Future<void> salvarNoBd(
     'titulo': titulo,
     'sintaxe': sintaxe,
     'createdAt': FieldValue.serverTimestamp(),
+  });
+}
+
+Future<void> atualizarNoBd(
+    String cardId,
+    String subcardId,
+    String titulo,
+    String sintaxe,
+    ) async {
+  final user = FirebaseAuth.instance.currentUser;
+
+  if (user == null) return;
+
+  await FirebaseFirestore.instance
+      .collection('usuarios')
+      .doc(user.uid)
+      .collection('memorizacoes')
+      .doc(cardId)
+      .collection('subcards')
+      .doc(subcardId)
+      .update({
+    'titulo': titulo,
+    'sintaxe': sintaxe,
   });
 }

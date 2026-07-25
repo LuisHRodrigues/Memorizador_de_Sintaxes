@@ -4,20 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../login_screen/login_screen.dart';
-import '../second_screen/body_second_screen.dart';
-import '../third_screen/sintaxis_body_view.dart';
+import '../syntax_form_screen/syntax_form_screen.dart';
+import '../syntax_viewer_screen/syntax_viewer_screen.dart';
 
-class BodyPrimaryScreen extends StatefulWidget {
+class SyntaxListScreen extends StatefulWidget {
   final String tituloDoCard; // isso aqui é o cardId
+  final String nomeDoCard; // nome exibido do card, usado no título da tela
 
-  const BodyPrimaryScreen({super.key, required this.tituloDoCard});
+  const SyntaxListScreen({
+    super.key,
+    required this.tituloDoCard,
+    required this.nomeDoCard,
+  });
 
   @override
-  State<BodyPrimaryScreen> createState() => _BodyPrimaryScreenState();
+  State<SyntaxListScreen> createState() => _SyntaxListScreenState();
 }
 
-class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
+class _SyntaxListScreenState extends State<SyntaxListScreen> {
   bool _isNavigating = false;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _goToAddSintaxe() async {
     if (_isNavigating) return;
@@ -31,9 +44,35 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
       await Navigator.push(
         context,
         _createRoute(
-          BodySecondScreen(
+          SyntaxFormScreen(
                 cardId: widget.tituloDoCard,
               ),
+        ),
+      );
+
+      _isNavigating = false;
+    });
+  }
+
+  Future<void> _goToEditSintaxe(
+      String subcardId, String titulo, String sintaxe) async {
+    if (_isNavigating) return;
+
+    _isNavigating = true;
+
+    // força a navegação fora do frame atual
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      await Navigator.push(
+        context,
+        _createRoute(
+          SyntaxFormScreen(
+            cardId: widget.tituloDoCard,
+            subcardId: subcardId,
+            initialTitulo: titulo,
+            initialSintaxe: sintaxe,
+          ),
         ),
       );
 
@@ -71,7 +110,7 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sintaxes Memorizer\n     Subcards"),
+        title: Text(widget.nomeDoCard),
         centerTitle: true,
         actions: [
           IconButton(
@@ -81,7 +120,41 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
         ],
       ),
 
-      body: StreamBuilder<QuerySnapshot>(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.trim().toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Pesquisar sintaxe ...",
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('usuarios')
             .doc(user.uid)
@@ -100,10 +173,24 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final docs = snapshot.data?.docs ?? [];
+          final allDocs = snapshot.data?.docs ?? [];
+
+          if (allDocs.isEmpty) {
+            return const Center(child: Text('Nenhuma sintaxe cadastrada.'));
+          }
+
+          final docs = _searchQuery.isEmpty
+              ? allDocs
+              : allDocs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final titulo = (data['titulo'] ?? '').toString().toLowerCase();
+                  final sintaxe = (data['sintaxe'] ?? '').toString().toLowerCase();
+                  return titulo.contains(_searchQuery) ||
+                      sintaxe.contains(_searchQuery);
+                }).toList();
 
           if (docs.isEmpty) {
-            return const Center(child: Text('Nenhuma sintaxe cadastrada.'));
+            return const Center(child: Text('Nenhuma sintaxe encontrada.'));
           }
 
           return ListView.builder(
@@ -137,7 +224,7 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
                             if (!mounted) return;
                             await Navigator.push(
                               context,
-                              _createRoute( BodyThirdScreen(
+                              _createRoute( SyntaxViewerScreen(
                                   titulo: titulo, cardId: widget.tituloDoCard,
                                 ),
                               ),
@@ -156,18 +243,18 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
                             if (value == "excluir") {
                               _excluirSubcard(subcardId);
                             } else if (value == "editar") {
-                              _abrirFormularioDeEdicao(context,subcardId);
+                              _goToEditSintaxe(subcardId, titulo, sintaxe);
                             }
                           },
                           itemBuilder: (context) =>
                           const [
                             PopupMenuItem(
                               value: "excluir",
-                              child: Text("Excluir"),
+                              child: Icon(Icons.delete_outline, color: Colors.red),
                             ),
                             PopupMenuItem(
                               value: "editar",
-                              child: Text("Editar"),
+                              child: Icon(Icons.edit_outlined),
                             ),
                           ],
                         ),
@@ -189,6 +276,9 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
             },
           );
         },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         elevation: 6,
@@ -199,125 +289,6 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
         duration: 500.ms,
         curve: Curves.elasticOut,
       ),
-    );
-  }
-
-  void _abrirFormularioDeEdicao(
-      BuildContext context,
-      String subcardId,
-      ) {
-
-    final TextEditingController controller =
-    TextEditingController();
-
-    showGeneralDialog(
-      context: context,
-
-      barrierDismissible: true,
-      barrierLabel: "Dialog",
-
-      transitionDuration:
-      const Duration(milliseconds: 250),
-
-      transitionBuilder:
-          (context, animation, secondaryAnimation, child) {
-
-        return Transform.scale(
-          scale: Curves.easeOutBack.transform(
-            animation.value,
-          ),
-
-          child: Opacity(
-            opacity: animation.value,
-            child: child,
-          ),
-        );
-      },
-
-      pageBuilder:
-          (context, animation, secondaryAnimation) {
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Center(
-              child: Dialog(
-                child: SizedBox(
-                  width: 250,
-                  height: 200,
-
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-
-                      children: [
-
-                        const Text(
-                          "Editar Titulo",
-                          style: TextStyle(fontSize: 22),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        TextField(
-                          controller: controller,
-
-                          decoration:
-                          const InputDecoration(
-                            labelText: "Novo nome ...",
-
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.all(
-                                Radius.circular(15),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.end,
-
-                          children: [
-
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-
-                              child:
-                              const Text("Cancelar"),
-                            ),
-
-                            ElevatedButton(
-                              onPressed: () {
-
-                                Navigator.pop(context);
-
-                                _editarTituloDoCard(
-                                  subcardId,
-                                  controller.text,
-                                );
-                              },
-
-                              child:
-                              const Text("Salvar"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -334,18 +305,6 @@ class _BodyPrimaryScreenState extends State<BodyPrimaryScreen> {
         .collection("subcards")
         .doc(subcardId)
         .delete();
-  }
-
-  Future<void> _editarTituloDoCard(String subcardId, String text) async {
-    if (user == null) return;
-    await FirebaseFirestore.instance
-        .collection("usuarios")
-        .doc(user?.uid)
-        .collection("memorizacoes")
-        .doc(widget.tituloDoCard)
-        .collection("subcards")
-        .doc(subcardId)
-        .update({"titulo": text});
   }
 
   Route _createRoute(Widget page) {
